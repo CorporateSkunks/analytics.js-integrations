@@ -103,6 +103,7 @@
     "lib/mouseflow.js",
     "lib/mousestats.js",
     "lib/olark.js",
+    "lib/omniture.js",
     "lib/optimizely.js",
     "lib/perfect-audience.js",
     "lib/pingdom.js",
