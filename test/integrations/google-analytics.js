@@ -49,6 +49,7 @@ describe('Google Analytics', function () {
     describe('#initialize', function () {
       beforeEach(function () {
         ga.load = sinon.spy();
+
       });
 
       it('should create window.GoogleAnalyticsObject', function () {
