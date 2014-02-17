@@ -11,7 +11,23 @@ describe('Omniture', function () {
     var omniture;
     var settings = {
         s_account: "123",
-        omnitureFile: "http://localhost/opfiles/cc/static/assets/common/js/event-tracker/omniture.js"
+        omnitureFile: "http://localhost/opfiles/cc/static/assets/common/js/event-tracker/omniture.js",
+
+        dictionary: {
+            breadcrumbs: "breadcrumb1-breadcrumb2"
+        },
+        mappings: {
+            page: {
+                "pageName": "{breadcrumbs}"
+            },
+            events: {
+                "Pay bill": {
+                    variables: {
+                        "evar56": "fooBar"
+                    }
+                }
+            }
+        }
     };
 
 
@@ -77,6 +93,35 @@ describe('Omniture', function () {
                     .page();
 
                 assert(s.t.called);
+                done();
+            });
+
+        });
+
+    });
+
+
+    describe("#Track event", function() {
+
+        beforeEach(function () {
+            sinon.stub(omniture, 'load');
+            omniture.initialize();
+            omniture.load.restore();
+        });
+
+        it("Should track a single event with a static variable", function(done) {
+
+            window.oca = {config: {debug: {}}};
+            omniture.load(function(err, e) {
+                if(err) done(err);
+
+                window.s.t = sinon.spy();
+                test(omniture)
+                    .track('Pay bill');
+
+                // Assert static variables from mapping
+                assert(s.evar56.equals('fooBar'));
+
                 done();
             });
 
