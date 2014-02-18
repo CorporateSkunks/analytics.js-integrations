@@ -17,22 +17,34 @@ describe('Omniture', function () {
 
         dictionary: {
             breadcrumbs: "breadcrumb1-breadcrumb2",
-            catFood: "fish"
+            catFood: "fish",
+            paymentMethod: "Credit Card",
+            addons: "addon1:addon2"
         },
         mappings: {
             page: {
-                "pageName": "{breadcrumbs}"
+                "pageName": "{breadcrumbs}",
+                "variables": {
+                    evar10: "{page}"
+                }
             },
             events: {
                 "Pay bill": {
                     variables: {
-                        "evar56": "Credit Card"
+                        "evar56": "{paymentMethod}",
+                        "prop1": "{SessionID}",
+                        "evar60": "{outcome}"
                     },
                     events: ["event5"]
                 },
                 "Feed cat": {
                     variables: {
                         "prop1": "{catFood}"
+                    }
+                },
+                "View addons": {
+                    variables: {
+                        "eVar37": "{addons}"
                     }
                 }
             }
@@ -99,23 +111,49 @@ describe('Omniture', function () {
 
     describe("#Page", function() {
 
+//
+//        it("Should track a page with just a name", function() {
+//
+//                window.s.t = sinon.spy();
+//
+//                test(omniture)
+//                    .page(null, "My page");
+//
+//                assert(equal(window.s.pageName, "My page"));
+//
+//                // Verify that mapping variables are being set
+//                assert(equal(window.s.evar10, "Page load"));
+//
+//                assert(window.s.t.called);
+//
+//
+//        });
 
-        it("Should track a page", function(done) {
-
-            omniture.load(function(err, e) {
-                if(err) done(err);
+        it("Should track a page with a category and a name", function() {
 
                 window.s.t = sinon.spy();
+
                 test(omniture)
-                    .page();
+                    .page("My category", "My page in a category");
+
+                assert(equal(window.s.pageName, "My page in a category"));
+                assert(equal(window.s.channel, "My category"));
 
                 assert(window.s.t.called);
-                done();
-            });
-
         });
 
+
     });
+
+
+// TODO?
+//    describe("#Identify", function() {
+//
+//        it("Should identify a user", function() {
+//
+//        });
+//
+//    });
 
 
     describe("#Track event", function() {
@@ -149,8 +187,28 @@ describe('Omniture', function () {
                 assert(equal(window.s.prop1, 'fish'));
 
                 // Should have no events
-            console.log(window.s.linkTrackEvents);
-                assert(window.s.linkTrackEvents == "None");
+                assert(equal(window.s.linkTrackEvents, "None"));
+
+        });
+
+
+        it("Should track addons with addons in track method", function() {
+
+            test(omniture)
+                .track("View addons", {
+                    addons: "overrideAddons"
+                });
+
+            assert(equal(window.s.eVar37, "overrideAddons"))
+
+        });
+
+        it("Should track addons off the dictionnary", function() {
+
+            test(omniture)
+                .track("View addons");
+
+            assert(equal(window.s.eVar37, "addon1:addon2"))
 
         });
 
@@ -170,35 +228,19 @@ describe('Omniture', function () {
 
         });
 
+        it("Should still track an event even when there is no mapping for it", function() {
+
+            test(omniture)
+                .track('Feed dog', {
+                    catFood: "dog!"
+                });
+
+            assert(window.s.tl.calledWith(true, 'o', 'Feed dog'));
+
+        });
+
 
     });
-
-
-
-
-
-
-
-    // Check that omniture file is loaded
-
-    // Should initialize
-        // Should have a global variable
-
-
-    // Should Track page
-
-    // Track user
-
-    // Should Track events - Transactions
-
-    // Track links
-
-    // Track forms
-
-
-
-    // Can override configs
-
 
 
 
