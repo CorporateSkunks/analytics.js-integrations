@@ -1,9 +1,11 @@
 describe('Omniture', function () {
 
 
+    // Consider using AdobePulse Debugger tools in browser test @see https://developer.omniture.com/en_US/content_page/sitecatalyst-tagging/c-verify-the-tagging-code-with-the-adobe-digitalpulse-debugger
+
     var analytics = require('analytics');
     var assert = require('assert');
-//    var iso = require('to-iso-string');
+    var equal = require('equals');
     var Omniture = require('integrations/lib/omniture');
     var sinon = require('sinon');
     var test = require('integration-tester');
@@ -14,7 +16,8 @@ describe('Omniture', function () {
         omnitureFile: "http://localhost/opfiles/cc/static/assets/common/js/event-tracker/omniture.js",
 
         dictionary: {
-            breadcrumbs: "breadcrumb1-breadcrumb2"
+            breadcrumbs: "breadcrumb1-breadcrumb2",
+            catFood: "fish"
         },
         mappings: {
             page: {
@@ -24,6 +27,12 @@ describe('Omniture', function () {
                 "Pay bill": {
                     variables: {
                         "evar56": "fooBar"
+                    },
+                    events: ["event5"]
+                },
+                "Feed cat": {
+                    variables: {
+                        "prop1": "{catFood}"
                     }
                 }
             }
@@ -115,17 +124,46 @@ describe('Omniture', function () {
             omniture.load(function(err, e) {
                 if(err) done(err);
 
-                window.s.t = sinon.spy();
+                window.s.tl = sinon.spy();
                 test(omniture)
                     .track('Pay bill');
 
+                // Assert that Omniture send tracking function is called appropriately
+                assert(window.s.tl.calledWith(true, 'o', 'Pay bill'));
+
                 // Assert static variables from mapping
-                assert(s.evar56.equals('fooBar'));
+                assert(equal(window.s.evar56, 'fooBar'));
+
+                // Expect events to contain 'event5'
+                assert(window.s.events.indexOf('event5') !== -1);
 
                 done();
             });
 
         });
+
+
+        it("Should track a single event with a dynamic variable", function(done) {
+
+            window.oca = {config: {debug: {}}};
+            omniture.load(function(err, e) {
+                if(err) done(err);
+
+                test(omniture)
+                    .track('Feed cat');
+
+                // Assert dynamic variables from mapping
+                console.log(window.s.prop1);
+                assert(equal(window.s.prop1, 'fish'));
+
+                // Should have no events
+                assert(window.s.linkTrackEvents == "None");
+
+                done();
+            });
+
+        });
+
 
     });
 
