@@ -1,6 +1,6 @@
 describe('Omniture', function () {
 
-
+    var stringify = JSON.stringify;
     // Consider using AdobePulse Debugger tools in browser test @see https://developer.omniture.com/en_US/content_page/sitecatalyst-tagging/c-verify-the-tagging-code-with-the-adobe-digitalpulse-debugger
 
     var analytics = require('analytics');
@@ -26,7 +26,7 @@ describe('Omniture', function () {
             events: {
                 "Pay bill": {
                     variables: {
-                        "evar56": "fooBar"
+                        "evar56": "Credit Card"
                     },
                     events: ["event5"]
                 },
@@ -40,14 +40,33 @@ describe('Omniture', function () {
     };
 
 
-    beforeEach(function () {
+    beforeEach(function (done) {
+
+        JSON.stringify = function(obj) {
+            var seen = [];
+
+            return stringify(obj, function(key, val) {
+                if (typeof val === "object") {
+                    if (seen.indexOf(val) >= 0) { return; }
+                    seen.push(val);
+                }
+                return val;
+            });
+        };
+
         analytics.use(Omniture);
         omniture = new Omniture.Integration(settings);
-//            sinon.stub(omniture, "load");
-//            omniture.load = sinon.spy();
+
+        window.oca = {config: {debug: {}}};
+
+        omniture.load(function(err, e) {
+            if(err) done(err);
+            done();
+        });
     });
 
     afterEach(function () {
+        JSON.stringify = stringify;
         omniture.reset();
     });
 
@@ -56,18 +75,13 @@ describe('Omniture', function () {
 
             test(omniture)
                 .name("Omniture")
-                .global("s_account");
+                .global("s");
 
         });
     });
 
 
     describe('#load', function () {
-        beforeEach(function () {
-            sinon.stub(omniture, 'load');
-            omniture.initialize();
-            omniture.load.restore();
-        });
 
         it('should load the Omniture file', function (done) {
 
@@ -76,7 +90,7 @@ describe('Omniture', function () {
 
             omniture.load(function(err, e) {
                 if(err) done(err);
-                assert(window.s);
+                assert(typeof(window.s) === "object");
                 done();
             });
 
@@ -85,15 +99,9 @@ describe('Omniture', function () {
 
     describe("#Page", function() {
 
-        beforeEach(function () {
-            sinon.stub(omniture, 'load');
-            omniture.initialize();
-            omniture.load.restore();
-        });
 
         it("Should track a page", function(done) {
 
-            window.oca = {config: {debug: {}}};
             omniture.load(function(err, e) {
                 if(err) done(err);
 
@@ -101,7 +109,7 @@ describe('Omniture', function () {
                 test(omniture)
                     .page();
 
-                assert(s.t.called);
+                assert(window.s.t.called);
                 done();
             });
 
@@ -112,17 +120,8 @@ describe('Omniture', function () {
 
     describe("#Track event", function() {
 
-        beforeEach(function () {
-            sinon.stub(omniture, 'load');
-            omniture.initialize();
-            omniture.load.restore();
-        });
+        it("Should track a single event with a static variable", function() {
 
-        it("Should track a single event with a static variable", function(done) {
-
-            window.oca = {config: {debug: {}}};
-            omniture.load(function(err, e) {
-                if(err) done(err);
 
                 window.s.tl = sinon.spy();
                 test(omniture)
@@ -132,40 +131,50 @@ describe('Omniture', function () {
                 assert(window.s.tl.calledWith(true, 'o', 'Pay bill'));
 
                 // Assert static variables from mapping
-                assert(equal(window.s.evar56, 'fooBar'));
+                assert(equal(window.s.evar56, 'Credit Card'));
 
                 // Expect events to contain 'event5'
                 assert(window.s.events.indexOf('event5') !== -1);
 
-                done();
-            });
-
         });
 
 
-        it("Should track a single event with a dynamic variable", function(done) {
 
-            window.oca = {config: {debug: {}}};
-            omniture.load(function(err, e) {
-                if(err) done(err);
+        it("Should track a single event with a dynamic variable", function() {
 
                 test(omniture)
                     .track('Feed cat');
 
                 // Assert dynamic variables from mapping
-                console.log(window.s.prop1);
                 assert(equal(window.s.prop1, 'fish'));
 
                 // Should have no events
+            console.log(window.s.linkTrackEvents);
                 assert(window.s.linkTrackEvents == "None");
 
-                done();
-            });
+        });
+
+
+        it("Should track a single event with overriding dictionary parameter", function() {
+
+            test(omniture)
+                .track('Feed cat', {
+                    catFood: "dog!"
+                });
+
+            // Assert dynamic variables from track() params
+            assert(equal(window.s.prop1, 'dog!'));
+
+            // Should have no events
+            assert(window.s.linkTrackEvents == "None");
 
         });
 
 
     });
+
+
+
 
 
 
