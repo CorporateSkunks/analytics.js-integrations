@@ -39,7 +39,8 @@ describe('Omniture', function () {
                 },
                 "Feed cat": {
                     variables: {
-                        "prop1": "{catFood}"
+                        "prop1": "{catFood}",
+                        "prop2": "{addons}"
                     }
                 },
                 "View addons": {
@@ -223,6 +224,11 @@ describe('Omniture', function () {
             // Assert dynamic variables from track() params
             assert(equal(window.s.prop1, 'dog!'));
 
+            console.log(window.s.linkTrackVars);
+            // Verify linkTrackVars object
+            assert(window.s.linkTrackVars.indexOf('prop2') !== -1);
+            assert(window.s.linkTrackVars.indexOf('prop1') !== -1);
+
             // Should have no events
             assert(window.s.linkTrackEvents == "None");
 
@@ -238,6 +244,16 @@ describe('Omniture', function () {
             assert(window.s.tl.calledWith(true, 'o', 'Feed dog'));
 
         });
+
+
+        it("Should track a link ", function() {
+//            var $link = $();
+//            test(omniture).trackLink($(".switchRoamingButton"), 'Roaming transaction', {
+//                plan : 'Postpaid'
+//            });
+        })
+
+
 
 
     });
