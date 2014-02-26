@@ -9,7 +9,7 @@ describe('Omniture', function () {
     var Omniture = require('integrations/lib/omniture');
     var sinon = require('sinon');
     var test = require('integration-tester');
-//
+
     var omniture;
     var settings = {
         s_account: "123",
@@ -19,13 +19,14 @@ describe('Omniture', function () {
             breadcrumbs: "breadcrumb1-breadcrumb2",
             catFood: "fish",
             paymentMethod: "Credit Card",
-            addons: "addon1:addon2"
+            addons: "addon1:addon2",
+            deviceType: "Mobile"
         },
         mappings: {
             page: {
                 "pageName": "{breadcrumbs}",
                 "variables": {
-                    evar10: "{page}"
+                    "eVar10": "{deviceType}"
                 }
             },
             events: {
@@ -112,23 +113,23 @@ describe('Omniture', function () {
 
     describe("#Page", function() {
 
-//
-//        it("Should track a page with just a name", function() {
-//
-//                window.s.t = sinon.spy();
-//
-//                test(omniture)
-//                    .page(null, "My page");
-//
-//                assert(equal(window.s.pageName, "My page"));
-//
-//                // Verify that mapping variables are being set
-//                assert(equal(window.s.evar10, "Page load"));
-//
-//                assert(window.s.t.called);
-//
-//
-//        });
+
+        it("Should track a page with just a name", function() {
+
+                window.s.t = sinon.spy();
+
+                test(omniture)
+                    .page(null, "My page");
+
+                assert(equal(window.s.pageName, "My page"));
+
+                // Verify that mapping variables are being set
+                assert(equal(window.s.eVar10, "Mobile"));
+
+                assert(window.s.t.called);
+
+
+        });
 
         it("Should track a page with a category and a name", function() {
 
