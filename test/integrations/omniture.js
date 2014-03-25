@@ -101,6 +101,7 @@ describe('Omniture', function () {
 
             // TODO remove me when omniture file is cleaned up
             window.oca = {config: {debug: {}}};
+            delete window.s;
 
             omniture.load(function(err, e) {
                 if(err) done(err);
@@ -109,6 +110,24 @@ describe('Omniture', function () {
             });
 
         });
+
+
+      it('should not load the Omniture file if set to null', function (done) {
+
+        // TODO remove me when omniture file is cleaned up
+        window.oca = {config: {debug: {}}};
+        delete window.s;
+
+        omniture.options.omnitureFile = null;
+
+        omniture.load(function(err, e) {
+          if(err) done(err);
+          assert(typeof(window.s) === "undefined");
+          done();
+        });
+
+      });
+
     });
 
     describe("#Page", function() {
