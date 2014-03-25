@@ -1,4 +1,61 @@
 
+0.4.10 / 2014-03-19
+==================
+
+ * adding default id for curebit to insert into
+
+0.4.9 / 2014-03-14
+==================
+
+* curebit: campaign_tag fixes
+
+0.4.8 / 2014-03-14
+==================
+
+* more curebit fixes
+
+0.4.7 / 2014-03-14
+==================
+
+ * new curebit changes, fixes #67
+
+0.4.6 / 2014-03-12
+==================
+
+ * adwords: use `.appendChild()` and load `conversion.js` instead of the pixel.
+ * curebit: fix typo
+
+0.4.5 / 2014-03-06
+==================
+
+ * upgrade facade to 0.2.11
+
+0.4.4 / 2014-03-05
+==================
+
+ * add curebit identify, closes #62
+ * upgrade bugsnag to v2, closes #61
+ * fix intercom first, last name
+
+0.4.3 / 2014-02-26
+==================
+
+ * google-analytics: dont send user id by default
+
+0.4.2 / 2014-02-26
+==================
+
+ * google-analytics: send universal user id, closes #59
+ * churnbee: use an object instead of array for supported events
+ * intercom: remove counter option
+
+0.4.1 / 2014-02-18
+==================
+
+ * saasquatch: add checksum, accountId and image support, closes #58
+ * intercom: update track()
+ * lytics: not tracking pageview fix
+
 0.4.0 / 2014-02-10
 ==================
 
