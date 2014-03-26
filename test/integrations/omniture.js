@@ -30,6 +30,13 @@ describe('Omniture', function () {
                 }
             },
             events: {
+                "Test events": {
+                  events: ["event5"]
+                },
+                 "Test events B": {
+                   events: ["event5"]
+                 },
+
                 "Pay bill": {
                     variables: {
                         "evar56": "{paymentMethod}",
@@ -196,6 +203,20 @@ describe('Omniture', function () {
                 assert(window.s.events.indexOf('event5') !== -1);
 
         });
+
+
+//      it("Should not stack events when event name is the same", function() {
+//
+//
+//        window.s.tl = sinon.spy();
+//        window.s.events = "event5";
+//        test(omniture)
+//            .track('Test events B');
+//
+//        // Expect events to contain 'event5' instead of stacked 'event5,event5'
+//        assert(window.s.events.indexOf('event5,event5') === -1);
+//
+//      });
 
 
 
